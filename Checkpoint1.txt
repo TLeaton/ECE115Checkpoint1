@@ -1,0 +1,56 @@
+int whichBoard              = 1;    // Set this variable to 1 for uploading to the Nano, 0 for the Teensy.
+unsigned long led_timer     = millis(); 
+
+int teensyTransmit          = 5;
+int LED                     = 13;
+int arduinoRecieve          = 6;
+
+void setup() {
+  
+  DDRB |= 0x20;   //sets pin 13 to output
+  DDRD |= ~0x40; // sets pins 0,1,2,3,4,5,7 to ouput, 6 to input
+/*  pinMode(teensyTransmit,  OUTPUT);
+    pinMode(arduinoRecieve,  INPUT);
+*/  
+    Serial.begin(9600); //debug
+} // end of setup() function
+
+void loop() {
+ 
+  if ( whichBoard == 1 ) // Teensy Code
+  {
+    if (millis() - led_timer >= 500)
+    {
+      if (digitalRead(teensyTransmit) == HIGH)
+      {
+        PORTD &= 0xDF;    //digitalWrite(teensyTransmit, LOW);
+        PORTB &= 0x1F;    //digitalWrite(LED, LOW);
+        Serial.println("teensyTransmit is low");
+      }
+      
+    else
+    {
+      PORTD |= 0x20;    //digitalWrite(teensyTransmit, HIGH);
+      PORTB |= 0x20;    //digitalWrite(LED, HIGH);
+      Serial.println("teensyTransmit is high");   //debug
+    }
+    led_timer += 500;
+    }
+  }
+
+ 
+  if ( whichBoard == 0 ) // Arduino Code
+  {
+    if (digitalRead(arduinoRecieve) == HIGH){
+        PORTB |= 0x20;  //digitalWrite(LED, HIGH);
+        Serial.println("working"); //debug
+    }
+    else
+    {
+      PORTB &= 0x1F;  //digitalWrite(LED, LOW);
+      Serial.println("still working"); //debug
+    }
+  }
+
+} // end of loop() function
+//end of program
